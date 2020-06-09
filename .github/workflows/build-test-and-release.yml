@@ -73,7 +73,7 @@ jobs:
         shell: bash
 
       - name: Rename release binary
-        run: mv micron-language-interpreter-go* micron-interpreter-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
+        run: mv go-tcp-turbo-scanner* go-tcp-turbo-scanner-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
         shell: bash
 
       - name: Load release URL file from release job
@@ -95,6 +95,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: ./micron-interpreter-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
-          asset_name: micron-interpreter-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
+          asset_path: ./go-tcp-turbo-scanner-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
+          asset_name: go-tcp-turbo-scanner-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
           asset_content_type: application/octet-stream
