@@ -1,6 +1,8 @@
 package scanner
 
 import (
+	"fmt"
+	"net"
 	"sync"
 )
 
@@ -12,9 +14,9 @@ type TCPPortState struct {
 	IsOpen     bool
 }
 
-func ScanTCPPortsRange(done <-chan struct{}, minPort int, maxPort int) <-chan TCPPortState {
+func ScanTCPPortsRange(done <-chan struct{}, host string, minPort int, maxPort int) <-chan TCPPortState {
 	portsToScanChan := portNumberGenerator(done, minPort, maxPort)
-	return scanTCPPortsRange(done, portsToScanChan)
+	return scanTCPPortsRange(done, host, portsToScanChan)
 }
 
 func portNumberGenerator(done <-chan struct{}, minPort int, maxPort int) <-chan int {
@@ -35,7 +37,7 @@ func portNumberGenerator(done <-chan struct{}, minPort int, maxPort int) <-chan 
 	return portNumberChan
 }
 
-func scanTCPPortsRange(done <-chan struct{}, portsChan <-chan int) <-chan TCPPortState {
+func scanTCPPortsRange(done <-chan struct{}, host string, portsChan <-chan int) <-chan TCPPortState {
 	tcpPortScanResultChan := make(chan TCPPortState, portScanResultsBufferSize)
 
 	go func() {
@@ -52,7 +54,7 @@ func scanTCPPortsRange(done <-chan struct{}, portsChan <-chan int) <-chan TCPPor
 
 				go func(tcpPort int) {
 					defer wg.Done()
-					tcpPortScanResultChan <- scanSingleTCPPort(tcpPort)
+					tcpPortScanResultChan <- scanSingleTCPPort(host, tcpPort)
 				}(port)
 			}
 		}
@@ -63,12 +65,18 @@ func scanTCPPortsRange(done <-chan struct{}, portsChan <-chan int) <-chan TCPPor
 	return tcpPortScanResultChan
 }
 
-func scanSingleTCPPort(port int) TCPPortState {
-	// TODO Implement scanner
+func scanSingleTCPPort(host string, port int) TCPPortState {
+	address := fmt.Sprintf("%s:%d", host, port)
+
+	tcpConnection, tcpDialError := net.Dial("tcp", address)
 
 	tcpPortState := TCPPortState{
 		PortNumber: port,
-		IsOpen:     false,
+		IsOpen:     tcpDialError == nil,
+	}
+
+	if tcpDialError == nil {
+		tcpConnection.Close()
 	}
 
 	return tcpPortState
