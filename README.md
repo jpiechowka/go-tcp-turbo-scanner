@@ -11,7 +11,7 @@ Optional flags:
   -max-port int
         Maximum port number to scan, inclusive (default 65535)
   -min-port int
-        Minimum port number to scan, inclusive (defaults to 0)
+        Minimum port number to scan, inclusive (default 0)
   -threads int
         Number of threads to use for scanning (default 20)
 ```
