@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/jpiechowka/go-tcp-turbo-scanner/scanner"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	// TODO, min port, max port and host from command line
+
+	doneChan := make(chan struct{})
+	defer close(doneChan)
+
+	for tcpPortState := range scanner.ScanTCPPortsRange(doneChan, 0, 65535) {
+		fmt.Println(tcpPortState.PortNumber)
+	}
 }
