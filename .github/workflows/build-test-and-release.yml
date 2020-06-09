@@ -1,0 +1,100 @@
+name: Build, test and create release from version tag
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+
+  create_release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Output release file with upload URL for assets
+        run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+
+      - name: Upload release URL file as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release_url
+          path: release_url.txt
+
+  build_test_and_upload_assets:
+    needs: [create_release]
+    name: Build, test and upload release assets on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            binary_sufix: linux
+          - os: macOS-latest
+            binary_sufix: macOS
+          - os: windows-latest
+            binary_sufix: win.exe
+
+    steps:
+
+      - name: Set up Go on ${{ matrix.os }}
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.14
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Build on ${{ matrix.os }}
+        run: go build -v -a .
+
+      - name: Test on ${{ matrix.os }}
+        run: go test -v ./...
+
+      - name: Get the version from the tag
+        id: get_version
+        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+        shell: bash
+
+      - name: Rename release binary
+        run: mv micron-language-interpreter-go* micron-interpreter-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
+        shell: bash
+
+      - name: Load release URL file from release job
+        uses: actions/download-artifact@v2
+        with:
+          name: release_url
+
+      - name: Get release file name & upload URL
+        id: get_release_info
+        run: |
+          upload_url_value=`cat release_url.txt`
+          echo ::set-output name=upload_url::$upload_url_value
+        shell: bash
+
+      - name: Upload release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: ./micron-interpreter-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
+          asset_name: micron-interpreter-${{ steps.get_version.outputs.version}}-${{ matrix.binary_sufix }}
+          asset_content_type: application/octet-stream
