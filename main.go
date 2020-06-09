@@ -51,7 +51,7 @@ func main() {
 		fmt.Printf("Starting [%d/%d] scan of %s at %s\n", idx+1, len(hosts), host, time.Now().String())
 		fmt.Printf("Starting port: %d, Max port: %d, threads: %d\n\n", *minPort, *maxPort, *threads)
 
-		for tcpPortState := range scanner.ScanTCPPortsRange(doneChan, host, 0, 65535) {
+		for tcpPortState := range scanner.ScanTCPPortsRange(doneChan, host, *minPort, *maxPort) {
 			if tcpPortState.IsOpen {
 				allOpenPorts = allOpenPorts + fmt.Sprintf(" %d", tcpPortState.PortNumber)
 				fmt.Printf("[+] %s:%d port open\n", host, tcpPortState.PortNumber)
