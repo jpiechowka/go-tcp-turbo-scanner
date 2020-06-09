@@ -15,7 +15,7 @@ func main() {
 	// Parse command line arguments
 	// TODO Error checking
 	// In case of zero default value, default value message for flag is not printed. It needs to be explicitly added.
-	minPort := flag.Int("min-port", 0, "Minimum port number to scan, inclusive (defaults to 0)")
+	minPort := flag.Int("min-port", 0, "Minimum port number to scan, inclusive (default 0)")
 	maxPort := flag.Int("max-port", 65535, "Maximum port number to scan, inclusive")
 	// TODO Implement changing number of used threads / goroutines
 	threads := flag.Int("threads", 20, "Number of threads to use for scanning")
