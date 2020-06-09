@@ -3,9 +3,9 @@ A very small, fast, concurrent TCP scanner written in Go
 
 ### Usage
 ```
-Usage of go-tcp-turbo-scanner-v0.1.0-win.exe: [optional flags] <hostname>
+Usage of go-tcp-turbo-scanner: [optional flags] <hostname>
 Multiple hosts can scanned. Specify hosts separated by space after cli flags, for example:
-go-tcp-turbo-scanner-v0.1.0-win.exe --min-port 1111 --max-port 13337 host1 host2 host3
+go-tcp-turbo-scanner --min-port 1111 --max-port 13337 host1 host2 host3
 
 Optional flags:
   -max-port int
