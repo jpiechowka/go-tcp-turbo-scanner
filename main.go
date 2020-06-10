@@ -58,7 +58,11 @@ func main() {
 			}
 		}
 
-		fmt.Printf("[+] %s all open ports:%s\n", host, allOpenPorts)
+		if len(allOpenPorts) == 0 {
+			fmt.Printf("[+] %s there are no open ports\n", host)
+		} else {
+			fmt.Printf("[+] %s all open ports:%s\n", host, allOpenPorts)
+		}
 	}
 
 	fmt.Printf("Finished scanning %d hosts in %s", len(hosts), time.Since(startTime))
