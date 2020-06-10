@@ -17,7 +17,6 @@ func main() {
 	// In case of zero default value, default value message for flag is not printed. It needs to be explicitly added.
 	minPort := flag.Int("min-port", 0, "Minimum port number to scan, inclusive (default 0)")
 	maxPort := flag.Int("max-port", 65535, "Maximum port number to scan, inclusive")
-	// TODO Implement changing number of used threads / goroutines
 	threads := flag.Int("threads", 20, "Number of threads to use for scanning")
 
 	// Custom usage message
@@ -48,6 +47,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	//Check threads flag for correctness
+	if *threads < 1 {
+		fmt.Println("--threads value cannot be smaller than 1")
+		os.Exit(1)
+	}
+
 	hosts := flag.Args()
 
 	// Check argument errors, at least one host is required
@@ -72,7 +77,7 @@ func main() {
 		fmt.Printf("\nStarting [%d/%d] scan of %s at %s\n", idx+1, len(hosts), host, time.Now().String())
 		fmt.Printf("Starting port: %d, Max port: %d, threads: %d\n\n", *minPort, *maxPort, *threads)
 
-		for tcpPortState := range scanner.ScanTCPPortsRange(doneChan, host, *minPort, *maxPort) {
+		for tcpPortState := range scanner.ScanTCPPortsRange(doneChan, host, *minPort, *maxPort, *threads) {
 			if tcpPortState.IsOpen {
 				allOpenPorts = allOpenPorts + fmt.Sprintf(" %d", tcpPortState.PortNumber)
 				fmt.Printf("[+] %s:%d port open\n", host, tcpPortState.PortNumber)
