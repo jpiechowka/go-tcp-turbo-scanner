@@ -30,15 +30,6 @@ func main() {
 
 	flag.Parse()
 
-	// Check argument errors, at least one host is required
-	// TODO better argument checks, check for empty string
-	if len(os.Args) < 2 {
-		fmt.Println("One or more hosts are required to run")
-		fmt.Println("Specify hosts separated by space after cli flags, for example:")
-		fmt.Printf("%s --min-port 1111 --max-port 13337 host1 host2 host3\n", os.Args[0])
-		os.Exit(1)
-	}
-
 	// Check min-port or/and max-port values if necessary
 	if *minPort < 0 || *minPort >= 65534 {
 		fmt.Println("--min-port value cannot be smaller than 0 and larger than 65534")
@@ -56,14 +47,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	// TODO host error checking before starting the scan, fail fast
 	hosts := flag.Args()
-	// TODO host error checking
+
+	// Check argument errors, at least one host is required
+	if len(hosts) < 1 {
+		fmt.Println("One or more hosts are required to run")
+		fmt.Println("Specify hosts separated by space after cli flags, for example:")
+		fmt.Printf("%s --min-port 1111 --max-port 13337 host1 host2 host3\n", os.Args[0])
+		os.Exit(1)
+	}
 
 	startTime := time.Now()
 
 	for idx, host := range hosts {
-		// TODO host error checking
-
 		allOpenPorts := ""
 
 		fmt.Printf("\nStarting [%d/%d] scan of %s at %s\n", idx+1, len(hosts), host, time.Now().String())
