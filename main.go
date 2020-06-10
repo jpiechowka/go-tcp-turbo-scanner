@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/jpiechowka/go-tcp-turbo-scanner/scanner"
+	"net"
 	"os"
 	"time"
 )
@@ -47,7 +48,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// TODO host error checking before starting the scan, fail fast
 	hosts := flag.Args()
 
 	// Check argument errors, at least one host is required
@@ -55,6 +55,12 @@ func main() {
 		fmt.Println("One or more hosts are required to run")
 		fmt.Println("Specify hosts separated by space after cli flags, for example:")
 		fmt.Printf("%s --min-port 1111 --max-port 13337 host1 host2 host3\n", os.Args[0])
+		os.Exit(1)
+	}
+
+	// Check validity of hosts
+	if !areHostsValid(hosts) {
+		fmt.Println("Provided host / hosts are invalid")
 		os.Exit(1)
 	}
 
@@ -81,4 +87,19 @@ func main() {
 	}
 
 	fmt.Printf("Finished scanning %d hosts in %s", len(hosts), time.Since(startTime))
+}
+
+func areHostsValid(hosts []string) bool {
+	for _, host := range hosts {
+		addr := net.ParseIP(host)
+
+		if addr == nil {
+			_, lookupErr := net.LookupHost(host)
+			if lookupErr != nil {
+				return false
+			}
+		}
+	}
+
+	return true
 }
