@@ -1,8 +1,8 @@
 package scanner
 
 import (
-	"fmt"
 	"net"
+	"strconv"
 	"sync"
 )
 
@@ -66,7 +66,7 @@ func scanTCPPortsRange(done <-chan struct{}, host string, portsChan <-chan int) 
 }
 
 func scanSingleTCPPort(host string, port int) TCPPortState {
-	address := fmt.Sprintf("%s:%d", host, port)
+	address := net.JoinHostPort(host, strconv.Itoa(port))
 
 	tcpConnection, tcpDialError := net.Dial("tcp", address)
 
