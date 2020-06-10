@@ -13,7 +13,6 @@ func main() {
 	defer close(doneChan)
 
 	// Parse command line arguments
-	// TODO Error checking
 	// In case of zero default value, default value message for flag is not printed. It needs to be explicitly added.
 	minPort := flag.Int("min-port", 0, "Minimum port number to scan, inclusive (default 0)")
 	maxPort := flag.Int("max-port", 65535, "Maximum port number to scan, inclusive")
@@ -32,6 +31,7 @@ func main() {
 	flag.Parse()
 
 	// Check argument errors, at least one host is required
+	// TODO better argument checks, check for empty string
 	if len(os.Args) < 2 {
 		fmt.Println("One or more hosts are required to run")
 		fmt.Println("Specify hosts separated by space after cli flags, for example:")
@@ -39,7 +39,25 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Check min-port or/and max-port values if necessary
+	if *minPort < 0 || *minPort >= 65534 {
+		fmt.Println("--min-port value cannot be smaller than 0 and larger than 65534")
+		os.Exit(1)
+	} else if *minPort >= *maxPort {
+		fmt.Println("--min-port value cannot be larger or equal than --max-port value")
+		os.Exit(1)
+	}
+
+	if *maxPort < 1 || *maxPort > 65535 {
+		fmt.Println("--max-port value cannot be smaller than 1 and larger than 65535")
+		os.Exit(1)
+	} else if *maxPort <= *minPort {
+		fmt.Println("--max-port value cannot be smaller or equal than --min-port value")
+		os.Exit(1)
+	}
+
 	hosts := flag.Args()
+	// TODO host error checking
 
 	startTime := time.Now()
 
