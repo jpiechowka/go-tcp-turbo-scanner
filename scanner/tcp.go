@@ -1,6 +1,7 @@
 package scanner
 
 import (
+	"fmt"
 	"net"
 	"strconv"
 	"sync"
@@ -14,12 +15,12 @@ type TCPPortState struct {
 	IsOpen     bool
 }
 
-func ScanTCPPortsRange(done <-chan struct{}, host string, minPort int, maxPort int, maxConcurrency int) <-chan TCPPortState {
+func ScanTCPPortsRange(done <-chan struct{}, host string, minPort int, maxPort int, maxConcurrency int, shouldPrintVerbose bool) <-chan TCPPortState {
 	portsToScanChan := portNumberGenerator(done, minPort, maxPort)
-	return scanTCPPortsRange(done, host, portsToScanChan, maxConcurrency)
+	return scanTCPPortsRange(done, host, portsToScanChan, maxConcurrency, shouldPrintVerbose)
 }
 
-func scanTCPPortsRange(done <-chan struct{}, host string, portsChan <-chan int, maxConcurrency int) <-chan TCPPortState {
+func scanTCPPortsRange(done <-chan struct{}, host string, portsChan <-chan int, maxConcurrency int, shouldPrintVerbose bool) <-chan TCPPortState {
 	tcpPortScanResultChan := make(chan TCPPortState, portScanResultsBufferSize)
 	concurrencyGuard := make(chan struct{}, maxConcurrency)
 
@@ -42,7 +43,7 @@ func scanTCPPortsRange(done <-chan struct{}, host string, portsChan <-chan int, 
 					defer func() {
 						<-concurrencyGuard
 					}()
-					tcpPortScanResultChan <- scanSingleTCPPort(host, tcpPort)
+					tcpPortScanResultChan <- scanSingleTCPPort(host, tcpPort, shouldPrintVerbose)
 				}(port)
 			}
 		}
@@ -53,8 +54,12 @@ func scanTCPPortsRange(done <-chan struct{}, host string, portsChan <-chan int, 
 	return tcpPortScanResultChan
 }
 
-func scanSingleTCPPort(host string, port int) TCPPortState {
+func scanSingleTCPPort(host string, port int, shouldPrintVerbose bool) TCPPortState {
 	address := net.JoinHostPort(host, strconv.Itoa(port))
+
+	if shouldPrintVerbose {
+		fmt.Println("[V] Scanning: " + address)
+	}
 
 	tcpConnection, tcpDialError := net.Dial("tcp", address)
 

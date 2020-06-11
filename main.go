@@ -18,6 +18,7 @@ func main() {
 	minPort := flag.Int("min-port", 0, "Minimum port number to scan, inclusive (default 0)")
 	maxPort := flag.Int("max-port", 65535, "Maximum port number to scan, inclusive")
 	threads := flag.Int("threads", 20, "Number of threads to use for scanning")
+	verbose := flag.Bool("verbose", false, "Enable verbose output")
 
 	// Custom usage message
 	flag.Usage = func() {
@@ -77,7 +78,7 @@ func main() {
 		fmt.Printf("\nStarting [%d/%d] scan of %s at %s\n", idx+1, len(hosts), host, time.Now().String())
 		fmt.Printf("Starting port: %d, Max port: %d, threads: %d\n\n", *minPort, *maxPort, *threads)
 
-		for tcpPortState := range scanner.ScanTCPPortsRange(doneChan, host, *minPort, *maxPort, *threads) {
+		for tcpPortState := range scanner.ScanTCPPortsRange(doneChan, host, *minPort, *maxPort, *threads, *verbose) {
 			if tcpPortState.IsOpen {
 				allOpenPorts = allOpenPorts + fmt.Sprintf(" %d", tcpPortState.PortNumber)
 				fmt.Printf("[+] %s:%d port open\n", host, tcpPortState.PortNumber)
@@ -85,9 +86,9 @@ func main() {
 		}
 
 		if len(allOpenPorts) == 0 {
-			fmt.Printf("[+] %s there are no open ports\n", host)
+			fmt.Printf("\n[+] %s there are no open ports\n", host)
 		} else {
-			fmt.Printf("[+] %s all open ports:%s\n", host, allOpenPorts)
+			fmt.Printf("\n[+] %s all open ports:%s\n", host, allOpenPorts)
 		}
 	}
 
