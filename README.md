@@ -38,6 +38,15 @@ Finished scanning 1 hosts in 26.9171835s
 Release binaries for every operating system can be found on the releases page:
 https://github.com/jpiechowka/go-tcp-turbo-scanner/releases
 
+### Building from source code
+If you do not want to download one of the prebuilt binaries simply execute the commands below to build from source (Go needs to be installed and properly configured, see https://golang.org/doc/install)
+
+```
+git clone https://github.com/jpiechowka/go-tcp-turbo-scanner.git
+cd go-tcp-turbo-scanner
+go build -v -a .
+```
+
 ### Automated builds status
 ![Build, test and create release from version tag](https://github.com/jpiechowka/go-tcp-turbo-scanner/workflows/Build,%20test%20and%20create%20release%20from%20version%20tag/badge.svg)
 
