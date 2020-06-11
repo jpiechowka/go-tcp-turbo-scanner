@@ -21,7 +21,7 @@ Optional flags:
 ### Example output
 Example scan of scanme.nmap.org
 ```
-./go-tcp-turbo-scanner --max-port 1500 --threads 100 scanme.nmap.org
+./go-tcp-turbo-scanner --max-port 1500 --threads 200 scanme.nmap.org
 
 Starting [1/1] scan of scanme.nmap.org at 2020-06-11 02:20:10.5493539 +0200 CEST m=+0.005925101
 Starting port: 0, Max port: 1500, threads: 200
