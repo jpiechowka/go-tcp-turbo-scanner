@@ -92,7 +92,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Finished scanning %d hosts in %s", len(hosts), time.Since(startTime))
+	fmt.Printf("\nFinished scanning %d hosts in %s", len(hosts), time.Since(startTime))
 }
 
 func areHostsValid(hosts []string) bool {

@@ -30,6 +30,7 @@ Starting port: 0, Max port: 1500, threads: 200
 [+] scanme.nmap.org:22 port open
 
 [+] scanme.nmap.org all open ports: 80 22
+
 Finished scanning 1 hosts in 26.9171835s
 ```
 
