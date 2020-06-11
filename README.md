@@ -19,7 +19,7 @@ Optional flags:
 ```
 
 ### Example output
-Example scan of scanme.nmap.org
+Example scan of ```scanme.nmap.org```
 ```
 ./go-tcp-turbo-scanner --max-port 1500 --threads 200 scanme.nmap.org
 
