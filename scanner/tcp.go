@@ -39,8 +39,10 @@ func scanTCPPortsRange(done <-chan struct{}, host string, portsChan <-chan int, 
 
 				go func(tcpPort int) {
 					defer wg.Done()
+					defer func() {
+						<-concurrencyGuard
+					}()
 					tcpPortScanResultChan <- scanSingleTCPPort(host, tcpPort)
-					<-concurrencyGuard
 				}(port)
 			}
 		}
